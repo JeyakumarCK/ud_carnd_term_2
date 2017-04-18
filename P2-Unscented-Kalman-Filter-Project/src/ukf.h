@@ -84,7 +84,7 @@ public:
   double NIS_laser_;
 
   ///* the constant for lowest value
-  constexpr static float LOW_VALUE = 0.00001;
+  constexpr static float LOW_VALUE = 0.0001;
 
   /**
    * Constructor

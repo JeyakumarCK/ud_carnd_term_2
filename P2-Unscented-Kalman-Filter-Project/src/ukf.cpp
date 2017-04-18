@@ -19,10 +19,10 @@ UKF::UKF() {
   use_radar_ = true;
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 3;
+  std_a_ = 0.3;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ = 3;
+  std_yawdd_ = 0.25;
 
   // Laser measurement noise standard deviation position1 in m
   std_laspx_ = 0.15;
@@ -168,7 +168,7 @@ void UKF::Prediction(double delta_t) {
   vector, x_. Predict sigma points, the state, and the state covariance matrix.
   */
 
-  cout << "Prediction with delta_t=" << delta_t << endl;
+  // cout << "Prediction with delta_t=" << delta_t << endl;
   // Step-1: Generate the Augmented Sigma points from the previous state and covariance matrices
   //create augmented mean vector
   VectorXd x_aug = VectorXd(n_aug_);
@@ -284,7 +284,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
   You'll also need to calculate the lidar NIS.
   */
-  cout << "UpdateLidar" << endl;
+  // cout << "UpdateLidar" << endl;
 
   // Measurement dimension, radar can measure r, phi, and r_dot
   int n_z = 2;
@@ -354,8 +354,9 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   P_ = P_ - K*S*K.transpose();
 
   // NIS Calculation
-  NIS_radar_ = z_diff.transpose() * S.inverse() * z_diff;
+  NIS_laser_ = z_diff.transpose() * S.inverse() * z_diff;
 
+  cout << "NIS_laser_ = " << NIS_laser_ << endl;
   // cout << "x_ after Lidar update = " << endl << x_ << endl;
   // cout << "P_ after Lidar update = " << endl << P_ << endl;
 
@@ -374,7 +375,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 
   You'll also need to calculate the radar NIS.
   */
-  cout << "UpdateRadar" << endl;
+  // cout << "UpdateRadar" << endl;
   // Measurement dimension, radar can measure r, phi, and r_dot
   int n_z = 3;
 
@@ -474,6 +475,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   // NIS Calculation
   NIS_radar_ = z_diff.transpose() * S.inverse() * z_diff;
 
+  cout << "NIS_radar_ = " << NIS_radar_ << endl;
   // cout << "x_ after Radar update = " << endl << x_ << endl;
   // cout << "P_ after Radar update = " << endl << P_ << endl;
 
