@@ -1,38 +1,35 @@
 # Unscented Kalman Filter Project Starter Code
 Self-Driving Car Engineer Nanodegree Program
----
+
 NIS Chart drawn on output new data input file (obj_pose-laser-radar-synthetic-input.txt)
 ![NIS Chart](/P2-Unscented-Kalman-Filter-Project/NIS_Chart.png?raw=true "NIS Chart")
 
 ##Results:
 For input date file obj_pose-laser-radar-synthetic-input.txt
-'''
+
 RMSE
 0.0581829
  0.092365
  0.327213
    0.2292
-'''
 
 For input date file sample-laser-radar-measurement-data-1.txt
-'''
+
 RMSE
 0.0768258
  0.081369
  0.588004
  0.573606
-'''
 
 For input date file sample-laser-radar-measurement-data-2.txt
-'''
+
 RMSE
 0.193348
  0.19039
 0.303672
 0.496079
-'''
+.
 ---
-
 ## Dependencies
 
 * cmake >= v3.5
