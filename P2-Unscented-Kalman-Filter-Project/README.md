@@ -2,7 +2,8 @@
 Self-Driving Car Engineer Nanodegree Program
 ---
 NIS Chart drawn on output new data input file (obj_pose-laser-radar-synthetic-input.txt)
-![NIS Chart](/src/NIS_Chart.png?raw=true "NIS Chart")
+![NIS Chart](/NIS_Chart.png?raw=true "NIS Chart")
+
 Results:
 For input date file obj_pose-laser-radar-synthetic-input.txt
 RMSE
