@@ -135,7 +135,13 @@ void UKF::Initialize(MeasurementPackage meas_package) {
     float rho_dot = meas_package.raw_measurements_[2];
 
     if (fabs(rho) < 0.001) rho = 0.001;
-    x_ << rho * cos(phi), rho * sin(phi), rho_dot * cos(phi), rho_dot * sin(phi), 0;
+    float px = rho * cos(phi);
+    float py = rho * sin(phi);
+    float vx = rho_dot * cos(phi);
+    float vy = rho_dot * sin(phi);
+
+    x_ << px,py,sqrt(vx*vx +vy*vy),0,0;
+
   }
   else if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
     /**
@@ -249,9 +255,10 @@ void UKF::Prediction(double delta_t) {
   
   // Step-3: Predicted Mean and Covariance matrix from the predicted sigma points
   x_.fill(0.0);
-  for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
-    x_ = x_+ weights_(i) * Xsig_pred_.col(i);
-  }
+  x_ = Xsig_pred_ * weights_;
+  // for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
+  //   x_ = x_+ weights_(i) * Xsig_pred_.col(i);
+  // }
 
   //predicted state covariance matrix
   P_.fill(0.0);
