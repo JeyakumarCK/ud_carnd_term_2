@@ -25,7 +25,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	normal_distribution<double> N_y_init(y, std[1]);
 	normal_distribution<double> N_theta_init(theta, std[2]);
 
-	num_particles = 1000;
+	num_particles = 1;
 	for (int i=0; i<num_particles; i++) {
 		Particle p = Particle();
 		p.id = i;
@@ -49,7 +49,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	double n_x, n_y, n_theta, velocity_by_yaw_rate, next_theta;
 
 	for (int i=0; i<particles.size(); i++) {
-
+		// cout << "Before Predition: Particle.x, y, theta, weight = " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << ", " << particles[i].weight << endl;
 		velocity_by_yaw_rate = velocity/yaw_rate;
 		next_theta = particles[i].theta + (yaw_rate * delta_t);
 		if (fabs(yaw_rate) > 0.01) {
@@ -72,6 +72,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		particles[i].x = particles[i].x + n_x;
 		particles[i].y = particles[i].y + n_y;
 		particles[i].theta = particles[i].theta + n_theta;
+		// cout << "After Predition: Particle.x, y, theta, weight = " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << ", " << particles[i].weight << endl;
 	}
 }
 
@@ -97,20 +98,23 @@ vector<LandmarkObs> ParticleFilter::dataAssociation(std::vector<LandmarkObs> pre
 				lowest_dt_idx = j;
 			}
 		}
-		if (predicted.size() > 0)
+		if (predicted.size() > 0) {
 			associated_lm.push_back(predicted[lowest_dt_idx]);
+			cout << "dataAssociation: obs[" << obs.x << ", " << obs.y << ", " << obs.id << "] = map[" << predicted[lowest_dt_idx].x << ", " << predicted[lowest_dt_idx].y << ", " << predicted[lowest_dt_idx].id << "]" << endl;
+		}
 	}
 	return associated_lm;
 }
 
-inline vector<LandmarkObs> local_to_map_coordinates(vector<LandmarkObs>& observations, Particle& p) {
+inline vector<LandmarkObs> local_to_map_coordinates(vector<LandmarkObs> observations, Particle p) {
 	vector<LandmarkObs> observations_map_coordinates;
 	for (int i=0; i<observations.size(); i++) {
 		LandmarkObs lo_g;
-		lo_g.x = (observations[i].x * cos(p.theta)) + (observations[i].y * sin(p.theta)) + p.x;
-		lo_g.y = (observations[i].x * sin(p.theta)) + (observations[i].y * cos(p.theta)) + p.y;
+		lo_g.x = p.x + (observations[i].x * cos(p.theta)) - (observations[i].y * sin(p.theta));
+		lo_g.y = p.y + (observations[i].x * sin(p.theta)) + (observations[i].y * cos(p.theta));
 		lo_g.id = observations[i].id;
 		observations_map_coordinates.push_back(lo_g);
+		cout << "coordinateTransformation: car[" << observations[i].x << ", " << observations[i].y << ", " << observations[i].id << "] = gps[" << lo_g.x << ", " << lo_g.y << ", " << lo_g.id << "]" << endl;
 	}
 	return observations_map_coordinates;
 }
@@ -121,10 +125,12 @@ inline double mvg(vector<LandmarkObs> obs, vector<LandmarkObs> lms, double std_l
 	double p1, p2x, p2y, p2, p3, p4; 
 	double tp = 1;
 	if (lms.size() < obs.size()) {
+		cout << "SSSSHOULDN'T BE HERE, BUT HERE IT IS" << endl; 
 		tp=0;
 		return tp;
 	}
 	for (int a=0; a<obs.size(); a++) {
+		// cout << "obs[a][x,y]=[" << obs[a].x << ", " << obs[a].y << "], lms[a][x,y]=[" << lms[a].x << ", " << lms[a].y << "]" << endl;
 		p1 = 1 / (2 * M_PI * std_landmark[0] * std_landmark[1]);
 		p2x = ((obs[a].x - lms[a].x)*(obs[a].x - lms[a].x)) / (2*std_landmark[0]*std_landmark[0]);
 		p2y = ((obs[a].y - lms[a].y)*(obs[a].y - lms[a].y)) / (2*std_landmark[1]*std_landmark[1]);
@@ -132,6 +138,7 @@ inline double mvg(vector<LandmarkObs> obs, vector<LandmarkObs> lms, double std_l
 		p3 = exp(p2);
 		p4 = p1*p3;
 		tp *= p4;
+		cout << "p2x=" << p2x << ", p2y=" << p2y << ", p2=" << p2 << ", p3=" << p3 << ", p4=" << p4 << ", tp=" << tp << endl;
 	}
 	return tp;
 }
@@ -157,14 +164,14 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		vector<Map::single_landmark_s> map_lms = map_landmarks.landmark_list;
 		double in_range;
 		for (int k=0; k<map_lms.size(); k++) {
-			in_range = dist(particles[i].x, particles[i].y, map_lms[k].x_f, map_lms[k].y_f);
-			if(sqrt(in_range) <= sensor_range) {
+			// in_range = dist(particles[i].x, particles[i].y, map_lms[k].x_f, map_lms[k].y_f);
+			// if(in_range <= sensor_range) {
 				LandmarkObs map_lm;
 				map_lm.x = map_lms[k].x_f;
 				map_lm.y = map_lms[k].y_f;
 				map_lm.id = map_lms[k].id_i;
 				pred_map_lms.push_back(map_lm);
-			}
+			// }
 		}
 
 		// Step-2: Transform Landmark observation from vehicle coordinate system to map coordinate system
@@ -178,6 +185,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		particles[i].weight =  tp;
 		weights[i] = particles[i].weight;
+		cout << "After updateWeights: Particle.x, y, theta, weight = " << particles[i].x << ", " << particles[i].y << ", " << particles[i].theta << ", " << particles[i].weight << endl;
 	} // End of particles for loop
 } // End of updateWeights function
 
