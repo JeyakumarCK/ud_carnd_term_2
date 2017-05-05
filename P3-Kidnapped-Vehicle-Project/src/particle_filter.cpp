@@ -77,7 +77,17 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	}
 }
 
-vector<LandmarkObs> ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
+void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
+	// TODO: Find the predicted measurement that is closest to each observed measurement and assign the 
+	//   observed measurement to this particular landmark.
+	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
+	//   implement this method and use it as a helper during the updateWeights phase.
+
+	// Implementation is in data_association function below
+
+}
+
+vector<LandmarkObs> data_association(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
 	// TODO: Find the predicted measurement that is closest to each observed measurement and assign the 
 	//   observed measurement to this particular landmark.
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
@@ -179,7 +189,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		vector<LandmarkObs> observations_mc = local_to_map_coordinates(observations, particles[i]);
 
 		// Step-3: Associate observations_mc with predicted map landmarks (in step-1)
-		vector<LandmarkObs> associated_lms = dataAssociation(pred_map_lms, observations_mc);
+		vector<LandmarkObs> associated_lms = data_association(pred_map_lms, observations_mc);
 
 		// Step-4: Calculate weight using multi variate gaussian probability density function
 		double tp = mvg(observations_mc, associated_lms, std_landmark);
