@@ -27,8 +27,8 @@ void PID::Init(double Kp, double Ki, double Kd) {
 	this->total_err = 0;
 	this->best_err = 1000;
 
-	this->Dpp = 1;
-  	this->Dpi = 1;
+	this->Dpp = 0.9;
+  	this->Dpi = 0.9;
   	this->Dpd = 1;
 
   	this->increasing = true;
