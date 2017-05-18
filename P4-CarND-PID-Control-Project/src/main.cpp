@@ -62,21 +62,16 @@ int main()
           */
           pid.UpdateError(cte);
           steer_value = pid.output_value;
+          pid.Twiddle();
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
-          double throttle_value = 0.3;
-          if (fabs(cte) > 0.6 && fabs(angle) > 7.5 && speed > 50.0) {
-            throttle_value = -1.0;
-          }
-
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = throttle_value;
+          msgJson["throttle"] = 0.3;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          if (pid.Twiddle())
-            msg = msg = "42[\"reset\",{}]";
+            // msg = msg = "42[\"reset\",{}]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
