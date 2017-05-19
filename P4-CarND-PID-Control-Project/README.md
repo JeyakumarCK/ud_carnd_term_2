@@ -13,7 +13,7 @@ Here is the output video of this code [https://youtu.be/Elb7Ao7EODY](https://you
 ### P (Proportional) Controller: 
 This controller output is proportional to the error (CTE), but in the opposite direction.  The coefficient Kp determines the magnitude of the effect of this controller.  Having bigger Kp makes it output bigger in each step, making the output value (steer value) changed drastically with in few steps.  In reality this drastic variation will render as the vehicle swerving left and right too fast losing the steer control.  In the below screen shot (that was driven with vehich high Kp value of 1.07), with in 5 steps, the steering value is increasing from -0.8 to -0.4, which is 50% change in the direction.
 
-[High P control](High_P_2.png)
+![High P control](High_P_2.png)
 
 ### I (Integral) Controller: 
 This controller is used to correct any systemic bias that cannot be eliminated.  For example, there is a strong wind and because of that the vehicle is getting drifted in one side.  Or the wheel is not aligned properly and dragging the vehicle in a particular direction.  Such bias can be eliminated by using the cumulative error over a period of time, factored by a Ki coefficient.  Most of the time, it will be almost zero.
